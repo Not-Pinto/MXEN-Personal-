@@ -5,19 +5,41 @@
 //include this .c file's header file
 #include "Robot.h"
 
-//static function prototypes, functions only called in this file
 
 int main(void)
 {
-  DDRA = 0xFF;//put PORTA into output mode
-  PORTA = 0; 
-  while(1)//main loop
+    adc_init();
+    _delay_ms(20);
+    DDRK = 0x00;
+    PORTK |= (1<<PK0); //Pull up 
+    DDRA = 0xFF;
+    PORTA = 0b00000000;
+    static uint16_t xJoystick = 0;
+    static uint16_t yJoystick = 0;
+    static uint8_t level = 0;
+    static uint8_t leds = 0b00000000;
+    static uint8_t xJoystickChannel = 0;
+    static uint8_t yJoystickChannel = 1;
+
+  while(1)
   {
-    _delay_ms(500);     //500 millisecond delay
-    PORTA |= (1<<PA2);  // note here PA3 is just an alias for the number 3
-                        // this line is equivalent to PORTA = PORTA | 0b00001000   which writes a HIGH to pin 3 of PORTA
-    _delay_ms(500); 
-    PORTA &= ~(1<<PA2); // this line is equivalent to PORTA = PORTA & (0b11110111)  which writes a HIGH to pin 3 of PORTA
+    leds = 0;
+    if(PINK & (1<<PK0))
+    {
+      xJoystick = adc_read(xJoystickChannel);
+      level = (xJoystick * 8) / 1024;
+    }
+    else
+    {
+      yJoystick = adc_read(yJoystickChannel);
+      level = (yJoystick * 8) / 1024;
+    }
+
+    for(int i = 0; i<level; i ++)
+    {
+      leds |= (1<<i);
+    }
+    PORTA = leds;
   }
   return(1);
-}//end main 
+}

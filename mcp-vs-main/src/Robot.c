@@ -4,78 +4,53 @@
 
 //include this .c file's header file
 #include "Robot.h"
-
+#define debounceDelay 
+volatile uint8_t edges = 0;
 
 int main(void)
-{
-    adc_init();
-    _delay_ms(20);
-    DDRA = 0xFF;
+{   
+    milliseconds_init();
+    serial0_init();
+
+    DDRA = 0xFF; 
     PORTA = 0b00000000;
-    static uint16_t record = 0;
-    static uint8_t lightChannel = 0;
-    static uint8_t level = 0;
-    static uint8_t leds = 0b00000000;
+    DDRE &= ~(1<<PE4); 
+    PORTE |= (1<<PE4); 
+
+    char send[50];
+    uint32_t secs = 0;
+    uint32_t new = 0;
+    uint32_t previousTime = 0;
+
+    cli();
+    EICRB &= ~(1<<ISC40);
+    EICRB |= (1<<ISC41);
+    EIMSK |= (1<<INT4); 
+    sei();
+
   while(1)
   {
-    leds = 0;
-    record = adc_read(lightChannel);
-    level = (((record) * 10) / 1024)-1;
-    for(int i = 0; i<level; i ++)
+    new = milliseconds_now();
+    if ((new - previousTime) >= 1000)
     {
-      leds |= (1<<i);
+        sprintf(send, "Edges recoded in sec %lu: %u\n", secs, edges);
+        serial0_print_string(send);
+        edges = 0;
+        secs += 1;
+        previousTime = new;
     }
-    PORTA = leds;
-  }
-   // for(int i = 0; i<level; i ++)
-   // {
-  //    leds |= (1<<i);
-  //  }
-   // PORTA = leds;
-  
-  return(1);
-}
-
-
-
-/*
-int main(void)
-{
-    adc_init();
-    _delay_ms(20);
-    DDRK = 0x00;
-    PORTK |= (1<<PK0); //Pull up 
-    DDRA = 0xFF;
-    PORTA = 0b00000000;
-    static uint16_t xJoystick = 0;
-    static uint16_t yJoystick = 0;
-    static uint8_t xJoystickChannel = 0;
-    static uint8_t yJoystickChannel = 1;
-    static uint8_t level = 0;
-    static uint8_t leds = 0b00000000;
-  while(1)
-  {
-    leds = 0;
-    if(PINK & (1<<PK0))
-    {
-      xJoystick = adc_read(xJoystickChannel);
-      level = (xJoystick * 9) / 1024;
-    }
-    else
-    {
-      yJoystick = adc_read(yJoystickChannel);
-      level = (yJoystick * 9) / 1024;
-    }
-
-    for(int i = 0; i<level; i ++)
-    {
-      leds |= (1<<i);
-    }
-    PORTA = leds;
   }
   return(1);
 }
-*/
 
+ISR(INT4_vect)
+{
+    uint32_t currentTime = milliseconds_now();
+    static uint32_t previousTime = 0;
+    if (currentTime - previousTime > debounceDelay)
+    {
+        previousTime = currentTime;
+        edges += 1;
+    }
+}
 
-// goday mate

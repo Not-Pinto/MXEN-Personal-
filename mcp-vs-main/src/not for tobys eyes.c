@@ -377,3 +377,25 @@ int main(void)
     }
   }
 */
+
+
+
+
+
+/*
+#include "Robot.h"
+
+int Main(void)
+  {
+    uint8_t RangeChannel = 1;
+    uint16_t record;
+    serial0_init();
+    DDRF = 0x00;
+while(1)
+    {
+      record = adc_read(RangeChannel);
+      sprintf(send, "ADC = %lu \n", record);
+      serial0_print_string(send);
+    }
+  }
+*/

@@ -348,3 +348,32 @@ int main(void)
     }
   }
 */
+
+
+
+/*
+#include "Robot.h"
+
+int main(void)
+  {
+    uint8_t RangeChannel = 1;
+    uint16_t record;
+
+    DDRA |= (1<<PA0);
+    PORTA &= ~(1<<PA0);
+    DDRF = 0x00;
+
+    while(1)
+    {
+      record = adc_read(RangeChannel);
+      if (record > 510)
+        {
+          PORTA |= (1<<PA0);
+        }
+      else
+        {
+          PORTA &= ~(1<<PA0);
+        }
+    }
+  }
+*/

@@ -17,6 +17,7 @@ int main(void)
   char send[40];
   uint16_t firstpoint = 0; 
   uint16_t seconds = 0;
+  uint16_t minutes = 0;
 
   DDRD &= ~(1<<DDD0);   
   PORTD |= (1<<PORTD0);
@@ -53,9 +54,10 @@ int main(void)
     }
     else
     {
-      seconds = rawtime / 1000;
-      firstpoint = (rawtime % 1000)/100;
-      sprintf(send, "\nTime: %u.%u\n", seconds, firstpoint);
+      seconds = (rawtime / 1000) % 60;
+      minutes = (rawtime / 1000) / 60;
+      firstpoint = (rawtime % 1000);
+      sprintf(send, "\nTime: %u:%u.%03u\n", minutes, seconds, firstpoint);
     }
     serial0_print_string(send);
   }

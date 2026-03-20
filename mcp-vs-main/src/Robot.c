@@ -48,20 +48,22 @@ int main(void)
 
   while(1)
   {
+    _delay_ms(50);
     if (rawtime == 0)
     {
-      sprintf(send, "\nTime: 0.0");
+      sprintf(send, "\n\n\n\n\n\n\nTime: 0.0\n\n\n\n\n\n");
     }
     else
     {
       seconds = (rawtime / 1000) % 60;
       minutes = (rawtime / 1000) / 60;
       firstpoint = (rawtime % 1000);
-      sprintf(send, "\nTime: %u:%u.%03u\n", minutes, seconds, firstpoint);
+      sprintf(send, "\n\n\n\n\n\n\nTime: %u:%u.%03u\n\n\n\n\n\n", minutes, seconds, firstpoint);
     }
     serial0_print_string(send);
   }
 }
+ 
 
 ISR(TIMER1_COMPA_vect)
 {

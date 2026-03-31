@@ -401,3 +401,196 @@ while(1)
     }
   }
 */
+
+
+
+
+/*
+#include "Robot.h"
+#define debounceDelay 200
+
+volatile uint32_t rawtime = 0;
+volatile bool start = false;
+
+int main(void)
+{
+  serial0_init();
+  milliseconds_init();
+
+  char send[40];
+  uint16_t firstpoint = 0; 
+  uint16_t seconds = 0;
+  uint16_t minutes = 0;
+
+  DDRD &= ~(1<<DDD0);   
+  PORTD |= (1<<PORTD0);
+
+  DDRE &= ~(1<<DDE4);   
+  PORTE |= (1<<PORTE4); 
+
+  TCCR1A = 0x00;
+  TCCR1B = 0x00;
+  TCCR1C = 0x00;
+
+  cli();
+
+  EICRA |= (1<<ISC01);
+  EICRA &= ~(1<<ISC00);
+  EIMSK |= (1<<INT0);
+
+  EICRB |= (1<<ISC41);
+  EICRB &= ~(1<<ISC40);
+  EIMSK |= (1<<INT4);
+
+  TCCR1B |= (1<<WGM12); 
+  TCCR1B |= (1<<CS11);
+  TCCR1B |= (1<<CS10);
+  OCR1A = 249;
+
+  sei(); 
+
+  while(1)
+  {
+    _delay_ms(50);
+    if (rawtime == 0)
+    {
+      sprintf(send, "\n\n\n\n\n\n\nTime: 0.0\n\n\n\n\n\n");
+    }
+    else
+    {
+      seconds = (rawtime / 1000) % 60;
+      minutes = (rawtime / 1000) / 60;
+      firstpoint = (rawtime % 1000);
+      sprintf(send, "\n\n\n\n\n\n\nTime: %u:%u.%03u\n\n\n\n\n\n", minutes, seconds, firstpoint);
+    }
+    serial0_print_string(send);
+  }
+}
+ 
+
+ISR(TIMER1_COMPA_vect)
+{
+  rawtime += 1;
+}
+
+ISR(INT4_vect) // start/stop
+{
+  uint32_t currentTime = milliseconds_now();
+  static uint32_t previousTime = 0;
+  if (currentTime - previousTime > debounceDelay)
+  {
+    previousTime = currentTime;
+    if (start == false)
+    {
+      start = true;
+      TIMSK1 = (1<<OCIE1A);
+    }
+    else
+    {
+      start = false;
+      TIMSK1 &= ~(1<<OCIE1A);
+    }
+  }
+}
+
+ISR(INT0_vect) // reset 
+{
+  uint32_t currentTime = milliseconds_now();
+  static uint32_t previousTime = 0;
+  if (currentTime - previousTime > debounceDelay)
+  {
+    previousTime = currentTime;
+    TIMSK1 &= ~(1<<OCIE1A);
+    start = false;
+    rawtime = 0;
+  }
+}
+
+*/
+
+
+
+
+
+
+
+/////////// LAB 6 ///////////
+
+// first part, finding relible range, start with 1070 and 1970, work down to 620 and up to 2420
+
+
+//Example ATmega2560 Project
+//File: ATmega2560Project.c
+//An example file for second year mechatronics project
+
+//include this .c file's header file
+
+/*
+#include "Robot.h"
+
+
+int main(void)
+{
+    DDRB |= (1 << PB5);
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TCCR1B |= (1 << WGM13);
+    TCCR1A |= (1 << COM1A1);
+    TCCR1B |= (1 << CS11);
+    ICR1 = 20000;
+
+    OCR1A = 620; // 0 degrees 0.640 ms 3.1% Duty cycle
+    //OCR1A = 2140; // 35 degrees 1.070 ms 5.45% Duty cycle
+    //OCR1A = 3940; // 145 degrees 1.970 ms 9.85% Duty cycle
+    //OCR1A = 4840; // 180 degrees 2.420 ms 21.1% Duty cycle
+    while (1)
+    {
+
+    }
+}
+*/
+
+
+/*
+#include "Robot.h"
+
+
+int main(void){
+
+  adc_init();
+
+  uint16_t x_joy_value;
+  uint16_t y_joy_value;
+
+  uint16_t x_servo_value;
+  uint16_t y_servo_value;
+
+    DDRB |= (1 << PB5);
+    DDRB |= (1<< PB6);
+
+    DDRF = 0;
+
+    TCCR1A = 0;
+    TCCR1B = 0;
+
+    TCCR1B |= (1 << WGM13);
+
+    TCCR1A |= (1 << COM1A1);
+    TCCR1A |= (1 << COM1B1);
+
+    TCCR1B |= (1 << CS11);
+    ICR1 = 20000;
+
+  while (1)
+  {
+    x_joy_value = adc_read(0);  
+    y_joy_value = adc_read(1); 
+    
+    x_servo_value = 980 + x_joy_value;
+    y_servo_value = 980 + y_joy_value;
+
+    OCR1A = x_servo_value;
+    OCR1B = y_servo_value;
+  }
+}
+*/

@@ -14,9 +14,12 @@ adc_init();
 
 uint32_t current_ms;
 uint32_t last_send_ms = 0;
+uint32_t last_recived_ms = 0;
 
-uint8_t x_joy_value8;
-uint8_t y_joy_value8;
+uint8_t error = 0;
+
+uint8_t x_joy_value8 = 127;
+uint8_t y_joy_value8 = 127;
 
 uint8_t recievedData[2];
 
@@ -24,9 +27,9 @@ uint16_t left_light_16;
 uint16_t right_light_16;
 uint16_t range_16;
 
-uint8_t left_light_8;
-uint8_t right_light_8;
-uint8_t range_8;
+uint8_t left_light_8 = 0;
+uint8_t right_light_8 = 0;
+uint8_t range_8 = 0;
 
   DDRB |= (1 << PB5);
   DDRB |= (1<< PB6);
@@ -46,6 +49,10 @@ uint8_t range_8;
 
 uint16_t x_servo_value;
 uint16_t y_servo_value;
+
+  DDRB |= (1 << PB0);
+  PORTB &= ~(1 << PB0);
+
 
 while(1){
 
@@ -70,10 +77,28 @@ while(1){
 		serial2_get_data(recievedData, 2);
     x_joy_value8 = recievedData[0];
     y_joy_value8 = recievedData[1];
+
+    last_recived_ms = current_ms;
+    error = 0;
+    PORTB &= ~(1 << PB0);
 	}
 
-  x_servo_value = 980 + (x_joy_value8 * 4);
-  y_servo_value = 980 + (y_joy_value8 * 4);
+  if ((current_ms - last_recived_ms) > 500){
+    error = 1;
+  }
+
+if (error){
+    PORTB |= (1 << PB0);
+    OCR1A = 1500;
+    OCR1B = 1500;
+}
+else{
+    x_servo_value = 980 + (x_joy_value8 * 4);
+    y_servo_value = 980 + (y_joy_value8 * 4);
+
+    OCR1A = x_servo_value;
+    OCR1B = y_servo_value;
+}
 
   OCR1A = x_servo_value;
   OCR1B = y_servo_value;

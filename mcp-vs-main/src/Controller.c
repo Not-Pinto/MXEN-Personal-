@@ -22,14 +22,14 @@ uint32_t last_send_ms = 0;
 uint16_t x_joy_value16;
 uint16_t y_joy_value16;
 
-uint8_t x_joy_value8;
-uint8_t y_joy_value8;
+uint8_t x_joy_value8 = 127;
+uint8_t y_joy_value8 = 127;
 
 uint8_t recievedData[3];
 
-uint8_t left_light_8;
-uint8_t right_light_8;
-uint8_t range_8;
+uint8_t left_light_8 = 0;
+uint8_t right_light_8 = 0;
+uint8_t range_8 = 0;
 
 uint8_t diff;
 char direction[10];
@@ -81,7 +81,7 @@ else{
   }
 }
 
-if (range_8 < 400) {
+if (range_8 < 100) {
   sprintf(move, "STOP"); 
 }
 else{

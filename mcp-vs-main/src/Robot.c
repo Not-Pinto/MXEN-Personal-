@@ -1,106 +1,163 @@
-//Example ATmega2560 Project
-//File: ATmega2560Project.c
-//An example file for second year mechatronics project
+/*
+test to see if i can get simple one way wireless comunication
 
-//include this .c file's header file
 #include "Robot.h"
 
 
-int main(void){
- 
-serial2_init();
-milliseconds_init();
-adc_init();
+int main(void)
+{
+    serial2_init();
+    serial0_init();
 
-uint32_t current_ms;
-uint32_t last_send_ms = 0;
-uint32_t last_recived_ms = 0;
+    uint8_t received;
 
-uint8_t error = 0;
-
-uint8_t x_joy_value8 = 127;
-uint8_t y_joy_value8 = 127;
-
-uint8_t recievedData[2];
-
-uint16_t left_light_16;
-uint16_t right_light_16;
-uint16_t range_16;
-
-uint8_t left_light_8 = 0;
-uint8_t right_light_8 = 0;
-uint8_t range_8 = 0;
-
-  DDRB |= (1 << PB5);
-  DDRB |= (1<< PB6);
-
-  DDRF = 0;
-
-  TCCR1A = 0;
-  TCCR1B = 0;
-
-  TCCR1B |= (1 << WGM13);
-
-  TCCR1A |= (1 << COM1A1);
-  TCCR1A |= (1 << COM1B1);
-
-  TCCR1B |= (1 << CS11);
-  ICR1 = 20000;
-
-uint16_t x_servo_value;
-uint16_t y_servo_value;
-
-  DDRB |= (1 << PB0);
-  PORTB &= ~(1 << PB0);
-
-
-while(1){
-
-  current_ms = milliseconds_now();
-
-  left_light_16 = adc_read(0);
-  right_light_16 = adc_read(1);
-  range_16 = adc_read(2);
-
-  left_light_8 = ((left_light_16 / 1024.0) * 256);
-  right_light_8 = ((right_light_16 / 1024.0) * 256);
-  range_8 = ((range_16 / 1024.0) * 256);
-
-  if( (current_ms-last_send_ms) >= 100) 
-	{
-		serial2_write_bytes(3, left_light_8, right_light_8, range_8); 
-		last_send_ms = current_ms;
-	}
-
-  if(serial2_available()) 
-	{
-		serial2_get_data(recievedData, 2);
-    x_joy_value8 = recievedData[0];
-    y_joy_value8 = recievedData[1];
-
-    last_recived_ms = current_ms;
-    error = 0;
-    PORTB &= ~(1 << PB0);
-	}
-
-  if ((current_ms - last_recived_ms) > 500){
-    error = 1;
-  }
-
-if (error){
-    PORTB |= (1 << PB0);
-    OCR1A = 1500;
-    OCR1B = 1500;
-}
-else{
-    x_servo_value = 980 + (x_joy_value8 * 4);
-    y_servo_value = 980 + (y_joy_value8 * 4);
-
-    OCR1A = x_servo_value;
-    OCR1B = y_servo_value;
+    while (1)
+    {
+        if (serial2_available())
+        {
+            received = serial2_read_byte();
+            char buffer[50];
+            sprintf(buffer, "Joystick X: %u\n", received);
+            serial0_print_string(buffer);
+        }
+    }
 }
 
-  OCR1A = x_servo_value;
-  OCR1B = y_servo_value;
+*/
+
+
+
+// for outcome 3
+/*
+#include "Robot.h"
+
+
+int main(void)
+{
+    serial2_init();
+    serial0_init();
+
+    uint8_t received = 120;
+
+    DDRB |= (1 << PB5);
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TCCR1B |= (1 << WGM13);
+    TCCR1A |= (1 << COM1A1);
+    TCCR1B |= (1 << CS11);
+    ICR1 = 5000;
+
+    while (1)
+    {
+        if (serial2_available())
+        {
+            received = serial2_read_byte();
+        }
+
+        if (received < 116){
+          OCR1A = ((uint32_t)5000 * (115 - received))/115;
+        }
+        else if (received > 139){
+          OCR1A = ((uint32_t)5000 * (received - 139))/115;
+        }
+        else{
+          OCR1A = 0;
+        }
+    }
 }
-} 
+
+*/
+
+
+
+// remainder of the lab
+
+/*
+#include "Robot.h"
+
+int main(void)
+{
+    serial2_init();
+    serial0_init();
+
+    uint8_t received_data[2] = {120, 120};
+    uint8_t left_y = 120;
+    uint8_t right_y = 120;
+
+    DDRB |= (1 << PB5);   
+    DDRB |= (1 << PB6);   
+
+    DDRA |= (1 << PA0);   
+    DDRA |= (1 << PA1);   
+    DDRA |= (1 << PA2);   
+    DDRA |= (1 << PA3);   
+
+    PORTA &= ~(1 << PA0);
+    PORTA &= ~(1 << PA1);
+    PORTA &= ~(1 << PA2);
+    PORTA &= ~(1 << PA3);
+
+    
+    TCCR1A = 0;
+    TCCR1B = 0;
+
+    TCCR1B |= (1 << WGM13);              
+    TCCR1A |= (1 << COM1A1);             
+    TCCR1A |= (1 << COM1B1);             
+    TCCR1B |= (1 << CS11);               
+
+    ICR1 = 5000;                         
+    OCR1A = 0;
+    OCR1B = 0;
+
+    while (1)
+    {
+        if (serial2_available())
+        {
+            serial2_get_data(received_data, 2);
+            left_y = received_data[0];
+            right_y = received_data[1];
+        }
+
+        if (left_y < 116)
+        {
+            PORTA &= ~(1 << PA0);
+            PORTA |=  (1 << PA1);
+            OCR1A = ((uint32_t)ICR1 * (115 - left_y)) / 115;
+        }
+        else if (left_y > 138)
+        {
+            PORTA |=  (1 << PA0);
+            PORTA &= ~(1 << PA1);
+            OCR1A = ((uint32_t)ICR1 * (left_y - 138)) / 115;
+        }
+        else
+        {
+            PORTA &= ~(1 << PA0);
+            PORTA &= ~(1 << PA1);
+            OCR1A = 0;
+        }
+
+        if (right_y < 116)
+        {
+            PORTA &= ~(1 << PA2);
+            PORTA |=  (1 << PA3);
+
+            OCR1B = ((uint32_t)ICR1 * (115 - right_y)) / 115;
+        }
+        else if (right_y > 138)
+        {
+
+            PORTA |=  (1 << PA2);
+            PORTA &= ~(1 << PA3);
+            OCR1B = ((uint32_t)ICR1 * (right_y - 138)) / 115;
+        }
+        else
+        {
+            PORTA &= ~(1 << PA2);
+            PORTA &= ~(1 << PA3);
+            OCR1B = 0;
+        }
+    }
+}
+*/

@@ -1,5 +1,5 @@
-/*
-test to see if i can get simple one way wireless comunication
+
+//test to see if i can get simple one way wireless comunication
 
 
 #include "Controller.h"
@@ -25,13 +25,13 @@ int main(void)
 
             joy_x_8bit = joy_x >> 2;
 
-            serial2_write_byte(joy_x_8bit);
+            serial2_write_bytes(1, joy_x_8bit);
 
             last_send_ms = current_ms;
         }
     }
 }
-*/
+
 
 
 

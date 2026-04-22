@@ -1,5 +1,5 @@
-/*
-test to see if i can get simple one way wireless comunication
+
+//test to see if i can get simple one way wireless comunication
 
 #include "Robot.h"
 
@@ -9,21 +9,21 @@ int main(void)
     serial2_init();
     serial0_init();
 
-    uint8_t received;
+    uint8_t received[2];
 
     while (1)
     {
         if (serial2_available())
         {
-            received = serial2_read_byte();
+            serial2_get_data(received, 1);
             char buffer[50];
-            sprintf(buffer, "Joystick X: %u\n", received);
+            sprintf(buffer, "Joystick X: %u\n", received[0]);
             serial0_print_string(buffer);
         }
     }
 }
 
-*/
+
 
 
 
